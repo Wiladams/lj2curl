@@ -1,20 +1,17 @@
-local ffi = require("ffi")
+local ffi = require("ffi");
 
-require ("curlver")         
---#include "curlbuild.h"       
---#include "curlrules.h"     
 
 
 --[[
-#if (defined(_WIN32) || defined(__WIN32__)) && \
-     !defined(WIN32) && !defined(__SYMBIAN32__)
+#if (defined(_WIN32); || defined(__WIN32__);); && \
+     !defined(WIN32); && !defined(__SYMBIAN32__);
 WIN32
 #endif
 
 #include <stdio.h>
 #include <limits.h>
 
-#if defined(__FreeBSD__) && (__FreeBSD__ >= 2)
+#if defined(__FreeBSD__); && (__FreeBSD__ >= 2);
 /* Needed for __FreeBSD_version symbol definition */
 #include <osreldate.h>
 #endif
@@ -23,8 +20,8 @@ WIN32
 #include <sys/types.h>
 #include <time.h>
 
-#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(__CYGWIN__)
-#if !(defined(_WINSOCKAPI_) || defined(_WINSOCK_H) || defined(__LWIP_OPT_H__))
+#if defined(WIN32); && !defined(_WIN32_WCE); && !defined(__CYGWIN__);
+#if !(defined(_WINSOCKAPI_); || defined(_WINSOCK_H); || defined(__LWIP_OPT_H__););
 /* The check above prevents the winsock2 inclusion if winsock.h already was
    included, since they can't co-exist without problems */
 #include <winsock2.h>
@@ -35,18 +32,18 @@ WIN32
 /* HP-UX systems version 9, 10 and 11 lack sys/select.h and so does oldish
    libc5-based Linux systems. Only include it on systems that are known to
    require it! */
-#if defined(_AIX) || defined(__NOVELL_LIBC__) || defined(__NetBSD__) || \
-    defined(__minix) || defined(__SYMBIAN32__) || defined(__INTEGRITY) || \
-    defined(ANDROID) || defined(__ANDROID__) || defined(__OpenBSD__) || \
-   (defined(__FreeBSD_version) && (__FreeBSD_version < 800000))
+#if defined(_AIX); || defined(__NOVELL_LIBC__); || defined(__NetBSD__); || \
+    defined(__minix); || defined(__SYMBIAN32__); || defined(__INTEGRITY); || \
+    defined(ANDROID); || defined(__ANDROID__); || defined(__OpenBSD__); || \
+   (defined(__FreeBSD_version); && (__FreeBSD_version < 800000););
 #include <sys/select.h>
 #endif
 
-#if !defined(WIN32) && !defined(_WIN32_WCE)
+#if !defined(WIN32); && !defined(_WIN32_WCE);
 #include <sys/socket.h>
 #endif
 
-#if !defined(WIN32) && !defined(__WATCOMC__) && !defined(__VXWORKS__)
+#if !defined(WIN32); && !defined(__WATCOMC__); && !defined(__VXWORKS__);
 #include <sys/time.h>
 #endif
 
@@ -67,13 +64,13 @@ typedef void CURL;
 
 #ifdef CURL_STATICLIB
 #  define CURL_EXTERN
-#elif defined(WIN32) || defined(_WIN32) || defined(__SYMBIAN32__)
-#  if defined(BUILDING_LIBCURL)
-#    define CURL_EXTERN  __declspec(dllexport)
+#elif defined(WIN32); || defined(_WIN32); || defined(__SYMBIAN32__);
+#  if defined(BUILDING_LIBCURL);
+#    define CURL_EXTERN  __declspec(dllexport);
 #  else
-#    define CURL_EXTERN  __declspec(dllimport)
+#    define CURL_EXTERN  __declspec(dllimport);
 #  endif
-#elif defined(BUILDING_LIBCURL) && defined(CURL_HIDDEN_SYMBOLS)
+#elif defined(BUILDING_LIBCURL); && defined(CURL_HIDDEN_SYMBOLS);
 #  define CURL_EXTERN CURL_EXTERN_SYMBOL
 #else
 #  define CURL_EXTERN
@@ -83,7 +80,7 @@ typedef void CURL;
 --[[
 #ifndef curl_socket_typedef
 /* socket typedef */
-#if defined(WIN32) && !defined(__LWIP_OPT_H__)
+#if defined(WIN32); && !defined(__LWIP_OPT_H__);
 typedef SOCKET curl_socket_t;
 CURL_SOCKET_BAD INVALID_SOCKET
 #else
@@ -114,7 +111,7 @@ struct curl_httppost {
 
   char *showfilename;               /* The file name to show. If not set, the
                                        actual file name will be used (if this
-                                       is a file part) */
+                                       is a file part); */
   void *userp;                      /* custom pointer used for
                                        HTTPPOST_CALLBACK posts */
   curl_off_t contentlen;            /* alternative length of contents
@@ -123,69 +120,52 @@ struct curl_httppost {
 };
 ]]
 
-/* specified content is a file name */
-CURL_HTTPPOST_FILENAME (1<<0)
-/* specified content is a file name */
-CURL_HTTPPOST_READFILE (1<<1)
-/* name is only stored pointer do not free in formfree */
-CURL_HTTPPOST_PTRNAME (1<<2)
-/* contents is only stored pointer do not free in formfree */
-CURL_HTTPPOST_PTRCONTENTS (1<<3)
-/* upload file from buffer */
-CURL_HTTPPOST_BUFFER (1<<4)
-/* upload file from pointer contents */
-CURL_HTTPPOST_PTRBUFFER (1<<5)
-/* upload file contents by using the regular read callback to get the data and
-   pass the given pointer as custom pointer */
-CURL_HTTPPOST_CALLBACK (1<<6)
-/* use size in 'contentlen', added in 7.46.0 */
-CURL_HTTPPOST_LARGE (1<<7)
+ffi.cdef[[
+static const int CURL_HTTPPOST_FILENAME =(1<<0);;
+static const int CURL_HTTPPOST_READFILE =(1<<1);;
+static const int CURL_HTTPPOST_PTRNAME =(1<<2);;
+static const int CURL_HTTPPOST_PTRCONTENTS =(1<<3);;
+static const int CURL_HTTPPOST_BUFFER =(1<<4);;
+static const int CURL_HTTPPOST_PTRBUFFER =(1<<5);;
+static const int CURL_HTTPPOST_CALLBACK =(1<<6);;
+static const int CURL_HTTPPOST_LARGE =(1<<7);;
+]]
 
 
 ffi.cdef[[
 /* This is the CURLOPT_PROGRESSFUNCTION callback proto. It is now considered
    deprecated but was the only choice up until 7.31.0 */
-typedef int (*curl_progress_callback)(void *clientp,
+typedef int (*curl_progress_callback);(void *clientp,
                                       double dltotal,
                                       double dlnow,
                                       double ultotal,
-                                      double ulnow);
+                                      double ulnow);;
 ]]
 
 ffi.cdef[[
 /* This is the CURLOPT_XFERINFOFUNCTION callback proto. It was introduced in
    7.32.0, it avoids floating point and provides more detailed information. */
-typedef int (*curl_xferinfo_callback)(void *clientp,
+typedef int (*curl_xferinfo_callback);(void *clientp,
                                       curl_off_t dltotal,
                                       curl_off_t dlnow,
                                       curl_off_t ultotal,
-                                      curl_off_t ulnow);
+                                      curl_off_t ulnow);;
 ]]
 
---[[
-#ifndef CURL_MAX_WRITE_SIZE
-  /* Tests have proven that 20K is a very bad buffer size for uploads on
-     Windows, while 16K for some odd reason performed a lot better.
-     We do the ifndef check to allow this value to easier be changed at build
-     time for those who feel adventurous. The practical minimum is about
-     400 bytes since libcurl uses a buffer of this size as a scratch area
-     (unrelated to network send operations). */
-CURL_MAX_WRITE_SIZE 16384
-#endif
---]]
+ffi.cdef[[
 
+static const int CURL_MAX_WRITE_SIZE = 16384;
 
-CURL_MAX_HTTP_HEADER (100*1024)
+static const int CURL_MAX_HTTP_HEADER = (100*1024);;
 
-/* This is a magic return code for the write callback that, when returned,
-   will signal libcurl to pause receiving on the current transfer. */
-CURL_WRITEFUNC_PAUSE 0x10000001
+static const int CURL_WRITEFUNC_PAUSE = 0x10000001;
+]]
 
 ffi.cdef[[
-typedef size_t (*curl_write_callback)(char *buffer,
+typedef size_t (*curl_write_callback);(char *buffer,
                                       size_t size,
                                       size_t nitems,
-                                      void *outstream);
+                                      void *outstream);;
 ]]
 
 ffi.cdef[[
@@ -206,20 +186,20 @@ typedef enum {
 
 ffi.cdef[[
 typedef enum {
-  CURLFINFOFLAG_KNOWN_FILENAME    (1<<0)
-  CURLFINFOFLAG_KNOWN_FILETYPE    (1<<1)
-  CURLFINFOFLAG_KNOWN_TIME        (1<<2)
-  CURLFINFOFLAG_KNOWN_PERM        (1<<3)
-  CURLFINFOFLAG_KNOWN_UID         (1<<4)
-  CURLFINFOFLAG_KNOWN_GID         (1<<5)
-  CURLFINFOFLAG_KNOWN_SIZE        (1<<6)
-  CURLFINFOFLAG_KNOWN_HLINKCOUNT  (1<<7)
+  CURLFINFOFLAG_KNOWN_FILENAME    (1<<0);
+  CURLFINFOFLAG_KNOWN_FILETYPE    (1<<1);
+  CURLFINFOFLAG_KNOWN_TIME        (1<<2);
+  CURLFINFOFLAG_KNOWN_PERM        (1<<3);
+  CURLFINFOFLAG_KNOWN_UID         (1<<4);
+  CURLFINFOFLAG_KNOWN_GID         (1<<5);
+  CURLFINFOFLAG_KNOWN_SIZE        (1<<6);
+  CURLFINFOFLAG_KNOWN_HLINKCOUNT  (1<<7);
 }
 ]]
 
 ffi.cdef[[
 /* Content of this structure depends on information which is known and is
-   achievable (e.g. by FTP LIST parsing). Please see the url_easy_setopt(3) man
+   achievable (e.g. by FTP LIST parsing);. Please see the url_easy_setopt(3); man
    page for callbacks returning this structure -- some fields are mandatory,
    some others are optional. The FLAG field has special meaning. */
 struct curl_fileinfo {
@@ -253,49 +233,45 @@ struct curl_fileinfo {
 ffi.cdef[[
 typedef enum {
 /* return codes for CURLOPT_CHUNK_BGN_FUNCTION */
-CURL_CHUNK_BGN_FUNC_OK      0
-CURL_CHUNK_BGN_FUNC_FAIL    1 /* tell the lib to end the task */
-CURL_CHUNK_BGN_FUNC_SKIP    2 /* skip this chunk over */
+CURL_CHUNK_BGN_FUNC_OK     = 0,
+CURL_CHUNK_BGN_FUNC_FAIL   = 1, /* tell the lib to end the task */
+CURL_CHUNK_BGN_FUNC_SKIP   = 2 /* skip this chunk over */
 }
 
 
 /* if splitting of data transfer is enabled, this callback is called before
    download of an individual chunk started. Note that parameter "remains" works
-   only for FTP wildcard downloading (for now), otherwise is not used */
-typedef long (*curl_chunk_bgn_callback)(const void *transfer_info,
+   only for FTP wildcard downloading (for now);, otherwise is not used */
+typedef long (*curl_chunk_bgn_callback);(const void *transfer_info,
                                         void *ptr,
-                                        int remains);
+                                        int remains);;
 ]]
 
+ffi.cdef[[
 enum {
-/* return codes for CURLOPT_CHUNK_END_FUNCTION */
-CURL_CHUNK_END_FUNC_OK      0
-CURL_CHUNK_END_FUNC_FAIL    1 /* tell the lib to end the task */
+  /* return codes for CURLOPT_CHUNK_END_FUNCTION */
+  CURL_CHUNK_END_FUNC_OK     = 0,
+  CURL_CHUNK_END_FUNC_FAIL   = 1 /* tell the lib to end the task */
 }
+]]
 
 ffi.cdef[[
-/* If splitting of data transfer is enabled this callback is called after
-   download of an individual chunk finished.
-   Note! After this callback was set then it have to be called FOR ALL chunks.
-   Even if downloading of this chunk was skipped in CHUNK_BGN_FUNC.
-   This is the reason why we don't need "transfer_info" parameter in this
-   callback and we are not interested in "remains" parameter too. */
-typedef long (*curl_chunk_end_callback)(void *ptr);
+typedef long (*curl_chunk_end_callback);(void *ptr);;
 ]]
 
 ffi.cdef[[
 /* return codes for FNMATCHFUNCTION */
-CURL_FNMATCHFUNC_MATCH    0 /* string corresponds to the pattern */
-CURL_FNMATCHFUNC_NOMATCH  1 /* pattern doesn't match the string */
-CURL_FNMATCHFUNC_FAIL     2 /* an error occurred */
+static const int CURL_FNMATCHFUNC_MATCH   = 0; /* string corresponds to the pattern */
+static const int CURL_FNMATCHFUNC_NOMATCH = 1; /* pattern doesn't match the string */
+static const int CURL_FNMATCHFUNC_FAIL    = 2; /* an error occurred */
 ]]
 
 ffi.cdef[[
 /* callback type for wildcard downloading pattern matching. If the
    string matches the pattern, return CURL_FNMATCHFUNC_MATCH value, etc. */
-typedef int (*curl_fnmatch_callback)(void *ptr,
+typedef int (*curl_fnmatch_callback);(void *ptr,
                                      const char *pattern,
-                                     const char *string);
+                                     const char *string);;
 ]]
 
 ffi.cdef[[
@@ -309,40 +285,43 @@ typedef enum {
 ]]
 
 ffi.cdfe[[
-typedef int (*curl_seek_callback)(void *instream,
+typedef int (*curl_seek_callback);(void *instream,
                                   curl_off_t offset,
-                                  int origin); /* 'whence' */
+                                  int origin);; /* 'whence' */
 ]]
 
-/* This is a return code for the read callback that, when returned, will
-   signal libcurl to immediately abort the current transfer. */
-CURL_READFUNC_ABORT 0x10000000
-/* This is a return code for the read callback that, when returned, will
-   signal libcurl to pause sending data on the current transfer. */
-CURL_READFUNC_PAUSE 0x10000001
+ffi.cdef[[
+static const int CURL_READFUNC_ABORT = 0x10000000;
+static const int CURL_READFUNC_PAUSE = 0x10000001;
+]]
 
-typedef size_t (*curl_read_callback)(char *buffer,
+ffi.cdef[[
+typedef size_t (*curl_read_callback);(char *buffer,
                                       size_t size,
                                       size_t nitems,
-                                      void *instream);
+                                      void *instream);;
 
 typedef enum  {
   CURLSOCKTYPE_IPCXN,  /* socket created for a specific IP connection */
-  CURLSOCKTYPE_ACCEPT, /* socket created by accept() call */
+  CURLSOCKTYPE_ACCEPT, /* socket created by accept(); call */
   CURLSOCKTYPE_LAST    /* never use */
 } curlsocktype;
-
-/* The return code from the sockopt_callback can signal information back
-   to libcurl: */
-CURL_SOCKOPT_OK 0
-CURL_SOCKOPT_ERROR 1 /* causes libcurl to abort and return
-                                CURLE_ABORTED_BY_CALLBACK */
-CURL_SOCKOPT_ALREADY_CONNECTED 2
+]]
 
 ffi.cdef[[
-typedef int (*curl_sockopt_callback)(void *clientp,
+/* The return code from the sockopt_callback can signal information back
+   to libcurl: */
+static const int CURL_SOCKOPT_OK = 0;
+static const int CURL_SOCKOPT_ERROR = 1; /* causes libcurl to abort and return
+                                CURLE_ABORTED_BY_CALLBACK */
+static const int CURL_SOCKOPT_ALREADY_CONNECTED = 2;
+]]
+
+
+ffi.cdef[[
+typedef int (*curl_sockopt_callback);(void *clientp,
                                      curl_socket_t curlfd,
-                                     curlsocktype purpose);
+                                     curlsocktype purpose);;
 ]]
 
 ffi.cdef[[
@@ -359,12 +338,12 @@ struct curl_sockaddr {
 
 ffi.cdef[[
 typedef curl_socket_t
-(*curl_opensocket_callback)(void *clientp,
+(*curl_opensocket_callback);(void *clientp,
                             curlsocktype purpose,
-                            struct curl_sockaddr *address);
+                            struct curl_sockaddr *address);;
 
 typedef int
-(*curl_closesocket_callback)(void *clientp, curl_socket_t item);
+(*curl_closesocket_callback);(void *clientp, curl_socket_t item);;
 ]]
 
 ffi.cdef[[
@@ -383,24 +362,26 @@ typedef enum  {
 ]]
 
 ffi.cdef[[
-typedef curlioerr (*curl_ioctl_callback)(CURL *handle,
+typedef curlioerr (*curl_ioctl_callback);(CURL *handle,
                                          int cmd,
-                                         void *clientp);
+                                         void *clientp);;
 ]]
 
-
+ffi.cdef[[
 /*
  * The following typedef's are signatures of malloc, free, realloc, strdup and
  * calloc respectively.  Function pointers of these types can be passed to the
- * curl_global_init_mem() function to set user defined memory management
+ * curl_global_init_mem(); function to set user defined memory management
  * callback routines.
  */
-typedef void *(*curl_malloc_callback)(size_t size);
-typedef void (*curl_free_callback)(void *ptr);
-typedef void *(*curl_realloc_callback)(void *ptr, size_t size);
-typedef char *(*curl_strdup_callback)(const char *str);
-typedef void *(*curl_calloc_callback)(size_t nmemb, size_t size);
+typedef void *(*curl_malloc_callback);(size_t size);;
+typedef void (*curl_free_callback);(void *ptr);;
+typedef void *(*curl_realloc_callback);(void *ptr, size_t size);;
+typedef char *(*curl_strdup_callback);(const char *str);;
+typedef void *(*curl_calloc_callback);(size_t nmemb, size_t size);;
+]]
 
+ffi.cdef[[
 /* the kind of data that is passed to information_callback*/
 typedef enum {
   CURLINFO_TEXT = 0,
@@ -412,21 +393,18 @@ typedef enum {
   CURLINFO_SSL_DATA_OUT, /* 6 */
   CURLINFO_END
 } curl_infotype;
+]]
 
-typedef int (*curl_debug_callback)
+ffi.cdef[[
+typedef int (*curl_debug_callback);
        (CURL *handle,      /* the handle/transfer this concerns */
         curl_infotype type, /* what kind of data */
         char *data,        /* points to the data */
         size_t size,       /* size of the data pointed to */
-        void *userptr);    /* whatever the user please */
+        void *userptr);;    /* whatever the user please */
+]]
 
-/* All possible error codes from all sorts of curl functions. Future versions
-   may return other values, stay prepared.
-
-   Always add new return codes last. Never *EVER* remove any. The return
-   codes must remain the same!
- */
-
+ffi.cdef[[
 typedef enum {
   CURLE_OK = 0,
   CURLE_UNSUPPORTED_PROTOCOL,    /* 1 */
@@ -502,7 +480,7 @@ typedef enum {
   CURLE_OBSOLETE57,              /* 57 - NOT IN USE */
   CURLE_SSL_CERTPROBLEM,         /* 58 - problem with the local certificate */
   CURLE_SSL_CIPHER,              /* 59 - couldn't use specified cipher */
-  CURLE_SSL_CACERT,              /* 60 - problem with the CA cert (path?) */
+  CURLE_SSL_CACERT,              /* 60 - problem with the CA cert (path?); */
   CURLE_BAD_CONTENT_ENCODING,    /* 61 - Unrecognized/bad encoding */
   CURLE_LDAP_INVALID_URL,        /* 62 - Invalid LDAP URL */
   CURLE_FILESIZE_EXCEEDED,       /* 63 - Maximum file size exceeded */
@@ -536,11 +514,11 @@ typedef enum {
                                     connection */
   CURLE_AGAIN,                   /* 81 - socket is not ready for send/recv,
                                     wait till it's ready and try again (Added
-                                    in 7.18.2) */
+                                    in 7.18.2); */
   CURLE_SSL_CRL_BADFILE,         /* 82 - could not load CRL file, missing or
-                                    wrong format (Added in 7.19.0) */
+                                    wrong format (Added in 7.19.0); */
   CURLE_SSL_ISSUER_ERROR,        /* 83 - Issuer check failed.  (Added in
-                                    7.19.0) */
+                                    7.19.0); */
   CURLE_FTP_PRET_FAILED,         /* 84 - a PRET command failed */
   CURLE_RTSP_CSEQ_ERROR,         /* 85 - mismatch of RTSP CSeq numbers */
   CURLE_RTSP_SESSION_ERROR,      /* 86 - mismatch of RTSP Session Ids */
@@ -553,7 +531,9 @@ typedef enum {
   CURLE_SSL_INVALIDCERTSTATUS,   /* 91 - invalid certificate status */
   CURL_LAST /* never use! */
 } CURLcode;
+]]
 
+--[[
 #ifndef CURL_NO_OLDIES /* define this to test if your app builds with all
                           the obsolete stuff removed! */
 
@@ -574,7 +554,6 @@ CURLE_UNKNOWN_TELNET_OPTION CURLE_UNKNOWN_OPTION
 /* These are scheduled to disappear by 2009 */
 CURLE_SSL_PEER_CERTIFICATE CURLE_PEER_FAILED_VERIFICATION
 
---[[
 /* The following were added in 7.17.0 */
 /* These are scheduled to disappear by 2009 */
 CURLE_OBSOLETE CURLE_OBSOLETE50 /* no one should be using this! */
@@ -598,7 +577,7 @@ CURLE_TFTP_DISKFULL CURLE_REMOTE_DISK_FULL
 CURLE_TFTP_EXISTS CURLE_REMOTE_FILE_EXISTS
 CURLE_HTTP_RANGE_ERROR CURLE_RANGE_ERROR
 CURLE_FTP_SSL_FAILED CURLE_USE_SSL_FAILED
---]]
+
 
 
 /* The following were added earlier */
@@ -628,15 +607,19 @@ CURLOPT_WRITEINFO CURLOPT_OBSOLETE40
 CURLOPT_CLOSEPOLICY CURLOPT_OBSOLETE72
 
 #endif /*!CURL_NO_OLDIES*/
+--]]
 
+ffi.cdef[[
 /* This prototype applies to all conversion callbacks */
-typedef CURLcode (*curl_conv_callback)(char *buffer, size_t length);
+typedef CURLcode (*curl_conv_callback);(char *buffer, size_t length);;
 
-typedef CURLcode (*curl_ssl_ctx_callback)(CURL *curl,    /* easy handle */
+typedef CURLcode (*curl_ssl_ctx_callback);(CURL *curl,    /* easy handle */
                                           void *ssl_ctx, /* actually an
                                                             OpenSSL SSL_CTX */
-                                          void *userptr);
+                                          void *userptr);;
+]]
 
+ffi.cdef[[
 typedef enum {
   CURLPROXY_HTTP = 0,   /* added in 7.10, new in 7.19.4 default is to use
                            CONNECT HTTP/1.1 */
@@ -650,15 +633,17 @@ typedef enum {
                                    host name rather than the IP address. added
                                    in 7.18.0 */
 } curl_proxytype;  /* this enum was added in 7.10 */
+]]
 
+ffi.cdef[[
 /*
  * Bitmasks for CURLOPT_HTTPAUTH and CURLOPT_PROXYAUTH options:
  *
  * CURLAUTH_NONE         - No HTTP authentication
- * CURLAUTH_BASIC        - HTTP Basic authentication (default)
+ * CURLAUTH_BASIC        - HTTP Basic authentication (default);
  * CURLAUTH_DIGEST       - HTTP Digest authentication
- * CURLAUTH_NEGOTIATE    - HTTP Negotiate (SPNEGO) authentication
- * CURLAUTH_GSSNEGOTIATE - Alias for CURLAUTH_NEGOTIATE (deprecated)
+ * CURLAUTH_NEGOTIATE    - HTTP Negotiate (SPNEGO); authentication
+ * CURLAUTH_GSSNEGOTIATE - Alias for CURLAUTH_NEGOTIATE (deprecated);
  * CURLAUTH_NTLM         - HTTP NTLM authentication
  * CURLAUTH_DIGEST_IE    - HTTP Digest authentication with IE flavour
  * CURLAUTH_NTLM_WB      - HTTP NTLM authentication delegated to winbind helper
@@ -668,34 +653,36 @@ typedef enum {
  * CURLAUTH_ANYSAFE      - All fine types except Basic
  */
 
-CURLAUTH_NONE         ((unsigned long)0)
-CURLAUTH_BASIC        (((unsigned long)1)<<0)
-CURLAUTH_DIGEST       (((unsigned long)1)<<1)
-CURLAUTH_NEGOTIATE    (((unsigned long)1)<<2)
+static const int CURLAUTH_NONE         =((unsigned long);0);;
+static const int CURLAUTH_BASIC        =(((unsigned long);1);<<0);;
+static const int CURLAUTH_DIGEST       =(((unsigned long);1);<<1);;
+static const int CURLAUTH_NEGOTIATE    =(((unsigned long);1);<<2);;
 /* Deprecated since the advent of CURLAUTH_NEGOTIATE */
-CURLAUTH_GSSNEGOTIATE CURLAUTH_NEGOTIATE
-CURLAUTH_NTLM         (((unsigned long)1)<<3)
-CURLAUTH_DIGEST_IE    (((unsigned long)1)<<4)
-CURLAUTH_NTLM_WB      (((unsigned long)1)<<5)
-CURLAUTH_ONLY         (((unsigned long)1)<<31)
-CURLAUTH_ANY          (~CURLAUTH_DIGEST_IE)
-CURLAUTH_ANYSAFE      (~(CURLAUTH_BASIC|CURLAUTH_DIGEST_IE))
+static const int CURLAUTH_GSSNEGOTIATE =CURLAUTH_NEGOTIATE;
+static const int CURLAUTH_NTLM         =(((unsigned long);1);<<3);;
+static const int CURLAUTH_DIGEST_IE    =(((unsigned long);1);<<4);;
+static const int CURLAUTH_NTLM_WB      =(((unsigned long);1);<<5);;
+static const int CURLAUTH_ONLY         =(((unsigned long);1);<<31);;
+static const int CURLAUTH_ANY          =(~CURLAUTH_DIGEST_IE);;
+static const int CURLAUTH_ANYSAFE      =(~(CURLAUTH_BASIC|CURLAUTH_DIGEST_IE););;
 
-CURLSSH_AUTH_ANY       ~0     /* all types supported by the server */
-CURLSSH_AUTH_NONE      0      /* none allowed, silly but complete */
-CURLSSH_AUTH_PUBLICKEY (1<<0) /* public/private key files */
-CURLSSH_AUTH_PASSWORD  (1<<1) /* password */
-CURLSSH_AUTH_HOST      (1<<2) /* host key files */
-CURLSSH_AUTH_KEYBOARD  (1<<3) /* keyboard interactive */
-CURLSSH_AUTH_AGENT     (1<<4) /* agent (ssh-agent, pageant...) */
-CURLSSH_AUTH_DEFAULT CURLSSH_AUTH_ANY
+static const int CURLSSH_AUTH_ANY       =~0;     /* all types supported by the server */
+static const int CURLSSH_AUTH_NONE      =0;      /* none allowed, silly but complete */
+static const int CURLSSH_AUTH_PUBLICKEY =(1<<0);; /* public/private key files */
+static const int CURLSSH_AUTH_PASSWORD  =(1<<1);; /* password */
+static const int CURLSSH_AUTH_HOST      =(1<<2);; /* host key files */
+static const int CURLSSH_AUTH_KEYBOARD  =(1<<3);; /* keyboard interactive */
+static const int CURLSSH_AUTH_AGENT     =(1<<4);; /* agent (ssh-agent, pageant...); */
+static const int CURLSSH_AUTH_DEFAULT =CURLSSH_AUTH_ANY;
 
-CURLGSSAPI_DELEGATION_NONE        0      /* no delegation (default) */
-CURLGSSAPI_DELEGATION_POLICY_FLAG (1<<0) /* if permitted by policy */
-CURLGSSAPI_DELEGATION_FLAG        (1<<1) /* delegate always */
+static const int CURLGSSAPI_DELEGATION_NONE        =0;      /* no delegation (default); */
+static const int CURLGSSAPI_DELEGATION_POLICY_FLAG =(1<<0);; /* if permitted by policy */
+static const int CURLGSSAPI_DELEGATION_FLAG        =(1<<1);; /* delegate always */
 
-CURL_ERROR_SIZE 256
+static const int CURL_ERROR_SIZE =256;
+]]
 
+ffi.cdef[[
 enum curl_khtype {
   CURLKHTYPE_UNKNOWN,
   CURLKHTYPE_RSA1,
@@ -731,11 +718,11 @@ enum curl_khmatch {
 };
 
 typedef int
-  (*curl_sshkeycallback) (CURL *easy,     /* easy handle */
+  (*curl_sshkeycallback); (CURL *easy,     /* easy handle */
                           const struct curl_khkey *knownkey, /* known */
                           const struct curl_khkey *foundkey, /* found */
                           enum curl_khmatch, /* libcurl's view on the keys */
-                          void *clientp); /* custom pointer passed from app */
+                          void *clientp);; /* custom pointer passed from app */
 
 /* parameter for the CURLOPT_USE_SSL option */
 typedef enum {
@@ -745,20 +732,16 @@ typedef enum {
   CURLUSESSL_ALL,     /* SSL for all communication or fail */
   CURLUSESSL_LAST     /* not an option, never use */
 } curl_usessl;
+]]
 
+ffi.cdef[[
 /* Definition of bits for the CURLOPT_SSL_OPTIONS argument: */
 
-/* - ALLOW_BEAST tells libcurl to allow the BEAST SSL vulnerability in the
-   name of improving interoperability with older servers. Some SSL libraries
-   have introduced work-arounds for this flaw but those work-arounds sometimes
-   make the SSL communication fail. To regain functionality with those broken
-   servers, a user can this way allow the vulnerability back. */
-CURLSSLOPT_ALLOW_BEAST (1<<0)
+static const int CURLSSLOPT_ALLOW_BEAST = (1<<0);;
+static const int CURLSSLOPT_NO_REVOKE = (1<<1);;
+]]
 
-/* - NO_REVOKE tells libcurl to disable certificate revocation checks for those
-   SSL backends where such behavior is present. */
-CURLSSLOPT_NO_REVOKE (1<<1)
-
+--[[
 #ifndef CURL_NO_OLDIES /* define this to test if your app builds with all
                           the obsolete stuff removed! */
 
@@ -772,7 +755,9 @@ CURLFTPSSL_ALL CURLUSESSL_ALL
 CURLFTPSSL_LAST CURLUSESSL_LAST
 curl_ftpssl curl_usessl
 #endif /*!CURL_NO_OLDIES*/
+--]]
 
+ffi.cdef[[
 /* parameter for the CURLOPT_FTP_SSL_CCC option */
 typedef enum {
   CURLFTPSSL_CCC_NONE,    /* do not send CCC */
@@ -792,10 +777,10 @@ typedef enum {
 /* parameter for the CURLOPT_FTP_CREATE_MISSING_DIRS option */
 typedef enum {
   CURLFTP_CREATE_DIR_NONE,  /* do NOT create missing dirs! */
-  CURLFTP_CREATE_DIR,       /* (FTP/SFTP) if CWD fails, try MKD and then CWD
+  CURLFTP_CREATE_DIR,       /* (FTP/SFTP); if CWD fails, try MKD and then CWD
                                again if MKD succeeded, for SFTP this does
                                similar magic */
-  CURLFTP_CREATE_DIR_RETRY, /* (FTP only) if CWD fails, try MKD and then CWD
+  CURLFTP_CREATE_DIR_RETRY, /* (FTP only); if CWD fails, try MKD and then CWD
                                again even if MKD failed! */
   CURLFTP_CREATE_DIR_LAST   /* not an option, never use */
 } curl_ftpcreatedir;
@@ -808,88 +793,65 @@ typedef enum {
   CURLFTPMETHOD_SINGLECWD, /* one CWD to full dir, then work on file */
   CURLFTPMETHOD_LAST       /* not an option, never use */
 } curl_ftpmethod;
+]]
 
+ffi.cdef[[
 /* bitmask defines for CURLOPT_HEADEROPT */
-CURLHEADER_UNIFIED  0
-CURLHEADER_SEPARATE (1<<0)
+static const int CURLHEADER_UNIFIED  0
+static const int CURLHEADER_SEPARATE = (1<<0);
 
 /* CURLPROTO_ defines are for the CURLOPT_*PROTOCOLS options */
-CURLPROTO_HTTP   (1<<0)
-CURLPROTO_HTTPS  (1<<1)
-CURLPROTO_FTP    (1<<2)
-CURLPROTO_FTPS   (1<<3)
-CURLPROTO_SCP    (1<<4)
-CURLPROTO_SFTP   (1<<5)
-CURLPROTO_TELNET (1<<6)
-CURLPROTO_LDAP   (1<<7)
-CURLPROTO_LDAPS  (1<<8)
-CURLPROTO_DICT   (1<<9)
-CURLPROTO_FILE   (1<<10)
-CURLPROTO_TFTP   (1<<11)
-CURLPROTO_IMAP   (1<<12)
-CURLPROTO_IMAPS  (1<<13)
-CURLPROTO_POP3   (1<<14)
-CURLPROTO_POP3S  (1<<15)
-CURLPROTO_SMTP   (1<<16)
-CURLPROTO_SMTPS  (1<<17)
-CURLPROTO_RTSP   (1<<18)
-CURLPROTO_RTMP   (1<<19)
-CURLPROTO_RTMPT  (1<<20)
-CURLPROTO_RTMPE  (1<<21)
-CURLPROTO_RTMPTE (1<<22)
-CURLPROTO_RTMPS  (1<<23)
-CURLPROTO_RTMPTS (1<<24)
-CURLPROTO_GOPHER (1<<25)
-CURLPROTO_SMB    (1<<26)
-CURLPROTO_SMBS   (1<<27)
-CURLPROTO_ALL    (~0) /* enable everything */
+static const int CURLPROTO_HTTP   = (1<<0);
+static const int CURLPROTO_HTTPS  = (1<<1);
+static const int CURLPROTO_FTP    = (1<<2);
+static const int CURLPROTO_FTPS   = (1<<3);
+static const int CURLPROTO_SCP    = (1<<4);
+static const int CURLPROTO_SFTP   = (1<<5);
+static const int CURLPROTO_TELNET = (1<<6);
+static const int CURLPROTO_LDAP   = (1<<7);
+static const int CURLPROTO_LDAPS  = (1<<8);
+static const int CURLPROTO_DICT   = (1<<9);
+static const int CURLPROTO_FILE   = (1<<10);
+static const int CURLPROTO_TFTP   = (1<<11);
+static const int CURLPROTO_IMAP   = (1<<12);
+static const int CURLPROTO_IMAPS  = (1<<13);
+static const int CURLPROTO_POP3   = (1<<14);
+static const int CURLPROTO_POP3S  = (1<<15);
+static const int CURLPROTO_SMTP   = (1<<16);
+static const int CURLPROTO_SMTPS  = (1<<17);
+static const int CURLPROTO_RTSP   = (1<<18);
+static const int CURLPROTO_RTMP   = (1<<19);
+static const int CURLPROTO_RTMPT  = (1<<20);
+static const int CURLPROTO_RTMPE  = (1<<21);
+static const int CURLPROTO_RTMPTE = (1<<22);
+static const int CURLPROTO_RTMPS  = (1<<23);
+static const int CURLPROTO_RTMPTS = (1<<24);
+static const int CURLPROTO_GOPHER = (1<<25);
+static const int CURLPROTO_SMB    = (1<<26);
+static const int CURLPROTO_SMBS   = (1<<27);
+static const int CURLPROTO_ALL    = (~0); /* enable everything */
+]]
 
-/* long may be 32 or 64 bits, but we should never depend on anything else
-   but 32 */
-CURLOPTTYPE_LONG          0
-CURLOPTTYPE_OBJECTPOINT   10000
-CURLOPTTYPE_FUNCTIONPOINT 20000
-CURLOPTTYPE_OFF_T         30000
-
-/* name is uppercase CURLOPT_<name>,
-   type is one of the defined CURLOPTTYPE_<type>
-   number is unique identifier */
-#ifdef CINIT
-#undef CINIT
-#endif
-
-#ifdef CURL_ISOCPP
-CINIT(na,t,nu) CURLOPT_ ## na = CURLOPTTYPE_ ## t + nu
-#else
-/* The macro "##" is ISO C, we assume pre-ISO C doesn't support it. */
-LONG          CURLOPTTYPE_LONG
-OBJECTPOINT   CURLOPTTYPE_OBJECTPOINT
-FUNCTIONPOINT CURLOPTTYPE_FUNCTIONPOINT
-OFF_T         CURLOPTTYPE_OFF_T
-CINIT(name,type,number) CURLOPT_/**/name = type + number
-#endif
-
-/*
- * This macro-mania below setups the CURLOPT_[what] enum, to be used with
- * curl_easy_setopt(). The first argument in the CINIT() macro is the [what]
- * word.
- */
--- like libpixman_ffi, embedded enum
-require("CINIT")
+local CurlOptions = require("curlopt");
 
 
-
+ffi.cdef[[
+typedef enum {
   /* Below here follows defines for the CURLOPT_IPRESOLVE option. If a host
      name resolves addresses using more than one IP protocol version, this
      option might be handy to force libcurl to use a specific IP version. */
-CURL_IPRESOLVE_WHATEVER 0 /* default, resolves addresses to all IP
+  CURL_IPRESOLVE_WHATEVER =0, /* default, resolves addresses to all IP
                                      versions that your system allows */
-CURL_IPRESOLVE_V4       1 /* resolve to IPv4 addresses */
-CURL_IPRESOLVE_V6       2 /* resolve to IPv6 addresses */
+  CURL_IPRESOLVE_V4       =1, /* resolve to IPv4 addresses */
+  CURL_IPRESOLVE_V6       =2 /* resolve to IPv6 addresses */
+]]
 
+ffi.cdef[[
   /* three convenient "aliases" that follow the name scheme better */
-CURLOPT_RTSPHEADER CURLOPT_HTTPHEADER
+static const int CURLOPT_RTSPHEADER = CURLOPT_HTTPHEADER;
+]]
 
+ffi.cdef[[
   /* These enums are for use with the CURLOPT_HTTP_VERSION option. */
 enum {
   CURL_HTTP_VERSION_NONE, /* setting this means we don't care, and that we'd
@@ -901,12 +863,17 @@ enum {
 
   CURL_HTTP_VERSION_LAST /* *ILLEGAL* http version */
 };
+]]
 
+
+ffi.cdef[[
 /* Convenience definition simple because the name of the version is HTTP/2 and
    not 2.0. The 2_0 version of the enum name was set while the version was
    still planned to be 2.0 and we stick to it for compatibility. */
-CURL_HTTP_VERSION_2 CURL_HTTP_VERSION_2_0
+static const int CURL_HTTP_VERSION_2 = CURL_HTTP_VERSION_2_0;
+]]
 
+ffi.cdef[[
 /*
  * Public API enums for RTSP requests
  */
@@ -925,7 +892,9 @@ enum {
     CURL_RTSPREQ_RECEIVE,
     CURL_RTSPREQ_LAST /* last in list */
 };
+]]
 
+ffi.cdef[[
   /* These enums are for use with the CURLOPT_NETRC option. */
 enum CURL_NETRC_OPTION {
   CURL_NETRC_IGNORED,     /* The .netrc will never be read.
@@ -955,19 +924,22 @@ enum CURL_TLSAUTH {
   CURL_TLSAUTH_SRP,
   CURL_TLSAUTH_LAST /* never use, keep last */
 };
+]]
 
+ffi.cdef[[
 /* symbols to use with CURLOPT_POSTREDIR.
    CURL_REDIR_POST_301, CURL_REDIR_POST_302 and CURL_REDIR_POST_303
    can be bitwise ORed so that CURL_REDIR_POST_301 | CURL_REDIR_POST_302
    | CURL_REDIR_POST_303 == CURL_REDIR_POST_ALL */
 
-CURL_REDIR_GET_ALL  0
-CURL_REDIR_POST_301 1
-CURL_REDIR_POST_302 2
-CURL_REDIR_POST_303 4
-CURL_REDIR_POST_ALL \
-    (CURL_REDIR_POST_301|CURL_REDIR_POST_302|CURL_REDIR_POST_303)
+static const int CURL_REDIR_GET_ALL  = 0;
+static const int CURL_REDIR_POST_301 = 1;
+static const int CURL_REDIR_POST_302 = 2;
+static const int CURL_REDIR_POST_303 = 4;
+static const int CURL_REDIR_POST_ALL = (CURL_REDIR_POST_301|CURL_REDIR_POST_302|CURL_REDIR_POST_303);;
+]]
 
+ffi.cdef[[
 typedef enum {
   CURL_TIMECOND_NONE,
 
@@ -977,66 +949,72 @@ typedef enum {
 
   CURL_TIMECOND_LAST
 } curl_TimeCond;
+]]
 
-
-/* curl_strequal() and curl_strnequal() are subject for removal in a future
+--[[
+/* curl_strequal(); and curl_strnequal(); are subject for removal in a future
    libcurl, see lib/README.curlx for details */
-CURL_EXTERN int (curl_strequal)(const char *s1, const char *s2);
-CURL_EXTERN int (curl_strnequal)(const char *s1, const char *s2, size_t n);
+CURL_EXTERN int (curl_strequal);(const char *s1, const char *s2);;
+CURL_EXTERN int (curl_strnequal);(const char *s1, const char *s2, size_t n);;
+--]]
 
+ffi.cdef[[
 /* name is uppercase CURLFORM_<name> */
 #ifdef CFINIT
 #undef CFINIT
 #endif
 
 #ifdef CURL_ISOCPP
-CFINIT(name) CURLFORM_ ## name
+CFINIT(name); CURLFORM_ ## name
 #else
 /* The macro "##" is ISO C, we assume pre-ISO C doesn't support it. */
-CFINIT(name) CURLFORM_/**/name
+CFINIT(name); CURLFORM_/**/name
 #endif
 
 typedef enum {
-  CFINIT(NOTHING),        /********* the first one is unused ************/
+  CFINIT(NOTHING);,        /********* the first one is unused ************/
 
   /*  */
-  CFINIT(COPYNAME),
-  CFINIT(PTRNAME),
-  CFINIT(NAMELENGTH),
-  CFINIT(COPYCONTENTS),
-  CFINIT(PTRCONTENTS),
-  CFINIT(CONTENTSLENGTH),
-  CFINIT(FILECONTENT),
-  CFINIT(ARRAY),
-  CFINIT(OBSOLETE),
-  CFINIT(FILE),
+  CFINIT(COPYNAME);,
+  CFINIT(PTRNAME);,
+  CFINIT(NAMELENGTH);,
+  CFINIT(COPYCONTENTS);,
+  CFINIT(PTRCONTENTS);,
+  CFINIT(CONTENTSLENGTH);,
+  CFINIT(FILECONTENT);,
+  CFINIT(ARRAY);,
+  CFINIT(OBSOLETE);,
+  CFINIT(FILE);,
 
-  CFINIT(BUFFER),
-  CFINIT(BUFFERPTR),
-  CFINIT(BUFFERLENGTH),
+  CFINIT(BUFFER);,
+  CFINIT(BUFFERPTR);,
+  CFINIT(BUFFERLENGTH);,
 
-  CFINIT(CONTENTTYPE),
-  CFINIT(CONTENTHEADER),
-  CFINIT(FILENAME),
-  CFINIT(END),
-  CFINIT(OBSOLETE2),
+  CFINIT(CONTENTTYPE);,
+  CFINIT(CONTENTHEADER);,
+  CFINIT(FILENAME);,
+  CFINIT(END);,
+  CFINIT(OBSOLETE2);,
 
-  CFINIT(STREAM),
-  CFINIT(CONTENTLEN), /* added in 7.46.0, provide a curl_off_t length */
+  CFINIT(STREAM);,
+  CFINIT(CONTENTLEN);, /* added in 7.46.0, provide a curl_off_t length */
 
   CURLFORM_LASTENTRY /* the last unused */
 } CURLformoption;
 
-#undef CFINIT /* done */
+]]
 
+ffi.cdef[[
 /* structure to be used as parameter for CURLFORM_ARRAY */
 struct curl_forms {
   CURLformoption option;
   const char     *value;
 };
+]]
 
+ffi.cdef[[
 /* use this for multipart formpost building */
-/* Returns code for curl_formadd()
+/* Returns code for curl_formadd();
  *
  * Returns:
  * CURL_FORMADD_OK             on success
@@ -1045,7 +1023,7 @@ struct curl_forms {
  * CURL_FORMADD_NULL           if a null pointer was given for a char
  * CURL_FORMADD_MEMORY         if the allocation of a FormInfo struct failed
  * CURL_FORMADD_UNKNOWN_OPTION if an unknown option was used
- * CURL_FORMADD_INCOMPLETE     if the some FormInfo is not complete (or error)
+ * CURL_FORMADD_INCOMPLETE     if the some FormInfo is not complete (or error);
  * CURL_FORMADD_MEMORY         if a curl_httppost struct cannot be allocated
  * CURL_FORMADD_MEMORY         if some allocation for string copying failed.
  * CURL_FORMADD_ILLEGAL_ARRAY  if an illegal option is used in an array
@@ -1064,198 +1042,94 @@ typedef enum {
 
   CURL_FORMADD_LAST /* last */
 } CURLFORMcode;
+]]
 
-/*
- * NAME curl_formadd()
- *
- * DESCRIPTION
- *
- * Pretty advanced function for building multi-part formposts. Each invoke
- * adds one part that together construct a full post. Then use
- * CURLOPT_HTTPPOST to send it off to libcurl.
- */
+ffi.cdef[[
 CURL_EXTERN CURLFORMcode curl_formadd(struct curl_httppost **httppost,
                                       struct curl_httppost **last_post,
-                                      ...);
+                                      ...);;
 
-/*
- * callback function for curl_formget()
- * The void *arg pointer will be the one passed as second argument to
- *   curl_formget().
- * The character buffer passed to it must not be freed.
- * Should return the buffer length passed to it as the argument "len" on
- *   success.
- */
-typedef size_t (*curl_formget_callback)(void *arg, const char *buf,
-                                        size_t len);
+typedef size_t (*curl_formget_callback);(void *arg, const char *buf,
+                                        size_t len);;
 
-/*
- * NAME curl_formget()
- *
- * DESCRIPTION
- *
- * Serialize a curl_httppost struct built with curl_formadd().
- * Accepts a void pointer as second argument which will be passed to
- * the curl_formget_callback function.
- * Returns 0 on success.
- */
 CURL_EXTERN int curl_formget(struct curl_httppost *form, void *arg,
-                             curl_formget_callback append);
-/*
- * NAME curl_formfree()
- *
- * DESCRIPTION
- *
- * Free a multipart formpost previously built with curl_formadd().
- */
-CURL_EXTERN void curl_formfree(struct curl_httppost *form);
+                             curl_formget_callback append);;
 
+CURL_EXTERN void curl_formfree(struct curl_httppost *form);;
+
+]]
+
+
+--[[
 /*
- * NAME curl_getenv()
+ * NAME curl_getenv();
  *
  * DESCRIPTION
  *
- * Returns a malloc()'ed string that MUST be curl_free()ed after usage is
+ * Returns a malloc();'ed string that MUST be curl_free();ed after usage is
  * complete. DEPRECATED - see lib/README.curlx
  */
-CURL_EXTERN char *curl_getenv(const char *variable);
+CURL_EXTERN char *curl_getenv(const char *variable);;
+--]]
 
-/*
- * NAME curl_version()
- *
- * DESCRIPTION
- *
- * Returns a static ascii string of the libcurl version.
- */
-CURL_EXTERN char *curl_version(void);
+ffi.cdef[[
 
-/*
- * NAME curl_easy_escape()
- *
- * DESCRIPTION
- *
- * Escapes URL strings (converts all letters consider illegal in URLs to their
- * %XX versions). This function returns a new allocated string or NULL if an
- * error occurred.
- */
+CURL_EXTERN char *curl_version(void);;
+
 CURL_EXTERN char *curl_easy_escape(CURL *handle,
                                    const char *string,
-                                   int length);
+                                   int length);;
 
-/* the previous version: */
-CURL_EXTERN char *curl_escape(const char *string,
-                              int length);
-
-
-/*
- * NAME curl_easy_unescape()
- *
- * DESCRIPTION
- *
- * Unescapes URL encoding in strings (converts all %XX codes to their 8bit
- * versions). This function returns a new allocated string or NULL if an error
- * occurred.
- * Conversion Note: On non-ASCII platforms the ASCII %XX codes are
- * converted into the host encoding.
- */
 CURL_EXTERN char *curl_easy_unescape(CURL *handle,
                                      const char *string,
                                      int length,
-                                     int *outlength);
+                                     int *outlength);;
+]]
+
+--[[
+/* the previous version: */
+CURL_EXTERN char *curl_escape(const char *string,
+                              int length);;
 
 /* the previous version */
 CURL_EXTERN char *curl_unescape(const char *string,
-                                int length);
+                                int length);;
+--]]
 
-/*
- * NAME curl_free()
- *
- * DESCRIPTION
- *
- * Provided for de-allocation in the same translation unit that did the
- * allocation. Added in libcurl 7.10
- */
-CURL_EXTERN void curl_free(void *p);
+ffi.cdef[[
 
-/*
- * NAME curl_global_init()
- *
- * DESCRIPTION
- *
- * curl_global_init() should be invoked exactly once for each application that
- * uses libcurl and before any call of other libcurl functions.
- *
- * This function is not thread-safe!
- */
-CURL_EXTERN CURLcode curl_global_init(long flags);
+CURL_EXTERN void curl_free(void *p);;
 
-/*
- * NAME curl_global_init_mem()
- *
- * DESCRIPTION
- *
- * curl_global_init() or curl_global_init_mem() should be invoked exactly once
- * for each application that uses libcurl.  This function can be used to
- * initialize libcurl and set user defined memory management callback
- * functions.  Users can implement memory management routines to check for
- * memory leaks, check for mis-use of the curl library etc.  User registered
- * callback routines with be invoked by this library instead of the system
- * memory management routines like malloc, free etc.
- */
+CURL_EXTERN CURLcode curl_global_init(long flags);;
+
 CURL_EXTERN CURLcode curl_global_init_mem(long flags,
                                           curl_malloc_callback m,
                                           curl_free_callback f,
                                           curl_realloc_callback r,
                                           curl_strdup_callback s,
-                                          curl_calloc_callback c);
+                                          curl_calloc_callback c);;
 
-/*
- * NAME curl_global_cleanup()
- *
- * DESCRIPTION
- *
- * curl_global_cleanup() should be invoked exactly once for each application
- * that uses libcurl
- */
-CURL_EXTERN void curl_global_cleanup(void);
+CURL_EXTERN void curl_global_cleanup(void);;
+]]
 
-/* linked-list structure for the CURLOPT_QUOTE option (and other) */
+ffi.cdef[[
+/* linked-list structure for the CURLOPT_QUOTE option (and other); */
 struct curl_slist {
   char *data;
   struct curl_slist *next;
 };
 
-/*
- * NAME curl_slist_append()
- *
- * DESCRIPTION
- *
- * Appends a string to a linked list. If no list exists, it will be created
- * first. Returns the new list, after appending.
- */
-CURL_EXTERN struct curl_slist *curl_slist_append(struct curl_slist *,
-                                                 const char *);
+CURL_EXTERN struct curl_slist *curl_slist_append(struct curl_slist *, const char *);;
 
-/*
- * NAME curl_slist_free_all()
- *
- * DESCRIPTION
- *
- * free a previously built curl_slist.
- */
-CURL_EXTERN void curl_slist_free_all(struct curl_slist *);
+CURL_EXTERN void curl_slist_free_all(struct curl_slist *);;
+]]
 
-/*
- * NAME curl_getdate()
- *
- * DESCRIPTION
- *
- * Returns the time, in seconds since 1 Jan 1970 of the time string given in
- * the first argument. The time argument in the second parameter is unused
- * and should be set to NULL.
- */
-CURL_EXTERN time_t curl_getdate(const char *p, const time_t *unused);
+ffi.cdef[[
 
+CURL_EXTERN time_t curl_getdate(const char *p, const time_t *unused);;
+]]
+
+ffi.cdef[[
 /* info about the certificate chain, only for OpenSSL builds. Asked
    for with CURLOPT_CERTINFO / CURLINFO_CERTINFO */
 struct curl_certinfo {
@@ -1288,14 +1162,16 @@ struct curl_tlssessioninfo {
   curl_sslbackend backend;
   void *internals;
 };
+]]
 
-CURLINFO_STRING   0x100000
-CURLINFO_LONG     0x200000
-CURLINFO_DOUBLE   0x300000
-CURLINFO_SLIST    0x400000
-CURLINFO_SOCKET   0x500000
-CURLINFO_MASK     0x0fffff
-CURLINFO_TYPEMASK 0xf00000
+ffi.cdef[[
+static const int CURLINFO_STRING   = 0x100000;
+static const int CURLINFO_LONG     = 0x200000;
+static const int CURLINFO_DOUBLE   = 0x300000;
+static const int CURLINFO_SLIST    = 0x400000;
+static const int CURLINFO_SOCKET   = 0x500000;
+static const int CURLINFO_MASK     = 0x0fffff;
+static const int CURLINFO_TYPEMASK = 0xf00000;
 
 typedef enum {
   CURLINFO_NONE, /* first, never use this */
@@ -1350,8 +1226,10 @@ typedef enum {
 
 /* CURLINFO_RESPONSE_CODE is the new name for the option previously known as
    CURLINFO_HTTP_CODE */
-CURLINFO_HTTP_CODE CURLINFO_RESPONSE_CODE
+static const int CURLINFO_HTTP_CODE = CURLINFO_RESPONSE_CODE;
+]]
 
+ffi.cdef[[
 typedef enum {
   CURLCLOSEPOLICY_NONE, /* first, never use this */
 
@@ -1363,13 +1241,16 @@ typedef enum {
 
   CURLCLOSEPOLICY_LAST /* last, never use this */
 } curl_closepolicy;
+]]
 
-CURL_GLOBAL_SSL (1<<0)
-CURL_GLOBAL_WIN32 (1<<1)
-CURL_GLOBAL_ALL (CURL_GLOBAL_SSL|CURL_GLOBAL_WIN32)
-CURL_GLOBAL_NOTHING 0
-CURL_GLOBAL_DEFAULT CURL_GLOBAL_ALL
-CURL_GLOBAL_ACK_EINTR (1<<2)
+ffi.cdef[[
+static const int CURL_GLOBAL_SSL =(1<<0);;
+static const int CURL_GLOBAL_WIN32 =(1<<1);;
+static const int CURL_GLOBAL_ALL =(CURL_GLOBAL_SSL|CURL_GLOBAL_WIN32);;
+static const int CURL_GLOBAL_NOTHING =0;
+static const int CURL_GLOBAL_DEFAULT =CURL_GLOBAL_ALL;
+static const int CURL_GLOBAL_ACK_EINTR =(1<<2);;
+]]
 
 ffi.cdef[[
 /*****************************************************************************
@@ -1399,13 +1280,13 @@ typedef enum {
   CURL_LOCK_ACCESS_LAST        /* never use */
 } curl_lock_access;
 
-typedef void (*curl_lock_function)(CURL *handle,
+typedef void (*curl_lock_function);(CURL *handle,
                                    curl_lock_data data,
                                    curl_lock_access locktype,
-                                   void *userptr);
-typedef void (*curl_unlock_function)(CURL *handle,
+                                   void *userptr);;
+typedef void (*curl_unlock_function);(CURL *handle,
                                      curl_lock_data data,
-                                     void *userptr);
+                                     void *userptr);;
 ]]
 
 ffi.cdef[[
@@ -1435,9 +1316,9 @@ typedef enum {
 ]]
 
 ffi.cdef[[
-CURL_EXTERN CURLSH *curl_share_init(void);
-CURL_EXTERN CURLSHcode curl_share_setopt(CURLSH *, CURLSHoption option, ...);
-CURL_EXTERN CURLSHcode curl_share_cleanup(CURLSH *);
+CURL_EXTERN CURLSH *curl_share_init(void);;
+CURL_EXTERN CURLSHcode curl_share_setopt(CURLSH *, CURLSHoption option, ...);;
+CURL_EXTERN CURLSHcode curl_share_cleanup(CURLSH *);;
 ]]
 
 ffi.cdef[[
@@ -1452,14 +1333,11 @@ typedef enum {
   CURLVERSION_FOURTH,
   CURLVERSION_LAST /* never actually use this */
 } CURLversion;
+
+static const int CURLVERSION_NOW  = CURLVERSION_FOURTH;
+
 ]]
 
-/* The 'CURLVERSION_NOW' is the symbolic name meant to be used by
-   basically all programs ever that want to get version information. It is
-   meant to be a built-in version number for what kind of struct the caller
-   expects. If the struct ever changes, we redefine the NOW to another enum
-   from above. */
-CURLVERSION_NOW CURLVERSION_FOURTH
 
 ffi.cdef[[
 typedef struct {
@@ -1491,75 +1369,86 @@ typedef struct {
 } curl_version_info_data;
 ]]
 
-CURL_VERSION_IPV6         (1<<0)  /* IPv6-enabled */
-CURL_VERSION_KERBEROS4    (1<<1)  /* Kerberos V4 auth is supported
-                                             (deprecated) */
-CURL_VERSION_SSL          (1<<2)  /* SSL options are present */
-CURL_VERSION_LIBZ         (1<<3)  /* libz features are present */
-CURL_VERSION_NTLM         (1<<4)  /* NTLM auth is supported */
-CURL_VERSION_GSSNEGOTIATE (1<<5)  /* Negotiate auth is supported
-                                             (deprecated) */
-CURL_VERSION_DEBUG        (1<<6)  /* Built with debug capabilities */
-CURL_VERSION_ASYNCHDNS    (1<<7)  /* Asynchronous DNS resolves */
-CURL_VERSION_SPNEGO       (1<<8)  /* SPNEGO auth is supported */
-CURL_VERSION_LARGEFILE    (1<<9)  /* Supports files larger than 2GB */
-CURL_VERSION_IDN          (1<<10) /* Internationized Domain Names are
-                                             supported */
-CURL_VERSION_SSPI         (1<<11) /* Built against Windows SSPI */
-CURL_VERSION_CONV         (1<<12) /* Character conversions supported */
-CURL_VERSION_CURLDEBUG    (1<<13) /* Debug memory tracking supported */
-CURL_VERSION_TLSAUTH_SRP  (1<<14) /* TLS-SRP auth is supported */
-CURL_VERSION_NTLM_WB      (1<<15) /* NTLM delegation to winbind helper
-                                             is suported */
-CURL_VERSION_HTTP2        (1<<16) /* HTTP2 support built-in */
-CURL_VERSION_GSSAPI       (1<<17) /* Built against a GSS-API library */
-CURL_VERSION_KERBEROS5    (1<<18) /* Kerberos V5 auth is supported */
-CURL_VERSION_UNIX_SOCKETS (1<<19) /* Unix domain sockets support */
-
 ffi.cdef[[
-CURL_EXTERN curl_version_info_data *curl_version_info(CURLversion);
-
-
-CURL_EXTERN const char *curl_easy_strerror(CURLcode);
-
-
-CURL_EXTERN const char *curl_share_strerror(CURLSHcode);
-
-
-CURL_EXTERN CURLcode curl_easy_pause(CURL *handle, int bitmask);
+static const int CURL_VERSION_IPV6         =(1<<0);;  /* IPv6-enabled */
+static const int CURL_VERSION_KERBEROS4    =(1<<1);;  /* Kerberos V4 auth is supported
+                                             (deprecated); */
+static const int CURL_VERSION_SSL          =(1<<2);;  /* SSL options are present */
+static const int CURL_VERSION_LIBZ         =(1<<3);;  /* libz features are present */
+static const int CURL_VERSION_NTLM         =(1<<4);;  /* NTLM auth is supported */
+static const int CURL_VERSION_GSSNEGOTIATE =(1<<5);;  /* Negotiate auth is supported
+                                             (deprecated); */
+static const int CURL_VERSION_DEBUG        =(1<<6);;  /* Built with debug capabilities */
+static const int CURL_VERSION_ASYNCHDNS    =(1<<7);;  /* Asynchronous DNS resolves */
+static const int CURL_VERSION_SPNEGO       =(1<<8);;  /* SPNEGO auth is supported */
+static const int CURL_VERSION_LARGEFILE    =(1<<9);;  /* Supports files larger than 2GB */
+static const int CURL_VERSION_IDN          =(1<<10);; /* Internationized Domain Names are
+                                             supported */
+static const int CURL_VERSION_SSPI         =(1<<11);; /* Built against Windows SSPI */
+static const int CURL_VERSION_CONV         =(1<<12);; /* Character conversions supported */
+static const int CURL_VERSION_CURLDEBUG    =(1<<13);; /* Debug memory tracking supported */
+static const int CURL_VERSION_TLSAUTH_SRP  =(1<<14);; /* TLS-SRP auth is supported */
+static const int CURL_VERSION_NTLM_WB      =(1<<15);; /* NTLM delegation to winbind helper
+                                             is suported */
+static const int CURL_VERSION_HTTP2        =(1<<16);; /* HTTP2 support built-in */
+static const int CURL_VERSION_GSSAPI       =(1<<17);; /* Built against a GSS-API library */
+static const int CURL_VERSION_KERBEROS5    =(1<<18);; /* Kerberos V5 auth is supported */
+static const int CURL_VERSION_UNIX_SOCKETS =(1<<19);; /* Unix domain sockets support */
 ]]
 
-CURLPAUSE_RECV      (1<<0)
-CURLPAUSE_RECV_CONT (0)
-
-CURLPAUSE_SEND      (1<<2)
-CURLPAUSE_SEND_CONT (0)
-
-CURLPAUSE_ALL       (CURLPAUSE_RECV|CURLPAUSE_SEND)
-CURLPAUSE_CONT      (CURLPAUSE_RECV_CONT|CURLPAUSE_SEND_CONT)
+ffi.cdef[[
+CURL_EXTERN curl_version_info_data *curl_version_info(CURLversion);;
 
 
+CURL_EXTERN const char *curl_easy_strerror(CURLcode);;
 
 
-require ("easy")
+CURL_EXTERN const char *curl_share_strerror(CURLSHcode);;
 
---#include "multi.h"
+
+CURL_EXTERN CURLcode curl_easy_pause(CURL *handle, int bitmask);;
+]]
+
+ffi.cdef[[
+static const int CURLPAUSE_RECV      =(1<<0);;
+static const int CURLPAUSE_RECV_CONT =(0);;
+
+static const int CURLPAUSE_SEND      =(1<<2);;
+static const int CURLPAUSE_SEND_CONT =(0);;
+
+static const int CURLPAUSE_ALL       =(CURLPAUSE_RECV|CURLPAUSE_SEND);;
+static const int CURLPAUSE_CONT      =(CURLPAUSE_RECV_CONT|CURLPAUSE_SEND_CONT);;
+]]
+
 
 --[[
-/* the typechecker doesn't work in C++ (yet) */
-#if defined(__STDC__) && (__STDC__ >= 1)
-/* This preprocessor magic that replaces a call with the exact same call is
-   only done to make sure application authors pass exactly three arguments
-   to these functions. */
-curl_easy_setopt(handle,opt,param) curl_easy_setopt(handle,opt,param)
-curl_easy_getinfo(handle,info,arg) curl_easy_getinfo(handle,info,arg)
-curl_share_setopt(share,opt,param) curl_share_setopt(share,opt,param)
-curl_multi_setopt(handle,opt,param) curl_multi_setopt(handle,opt,param)
-#endif /* __STDC__ >= 1 */
-#endif /* gcc >= 4.3 && !__cplusplus */
+  This is the "Easy" interface
 --]]
+ffi.cdef[[
+CURL *curl_easy_init(void);;
+CURLcode curl_easy_setopt(CURL *curl, CURLoption option, ...);;
+CURLcode curl_easy_perform(CURL *curl);;
+void curl_easy_cleanup(CURL *curl);;
 
 
-local Lib_curl = ffi.load("curl")
+CURLcode curl_easy_getinfo(CURL *curl, CURLINFO info, ...);;
+
+CURL* curl_easy_duphandle(CURL *curl);;
+
+void curl_easy_reset(CURL *curl);;
+
+CURLcode curl_easy_recv(CURL *curl, void *buffer, size_t buflen,
+                                    size_t *n);;
+
+CURLcode curl_easy_send(CURL *curl, const void *buffer,
+                                    size_t buflen, size_t *n);;
+]]
+
+
+require ("multi_ffi")
+
+
+
+local Lib_curl = ffi.load("curl");
 
 return Lib_curl
