@@ -12,10 +12,11 @@ end
 
 
 if Lib_curl then
+	local flags = 0;
     -- global_init(); must be called once per application lifetime
-    Lib_curl.curl_global_init();
+    Lib_curl.curl_global_init(flags);
 
-    ffi.gc(Lib_curl, Lib_curl_cleanup);
+    --ffi.gc(Lib_curl, Lib_curl_cleanup);
 else
 	return false;
 end
@@ -44,5 +45,47 @@ local function CURL_AT_LEAST_VERSION(x,y,z)
 end
 
 local exports = {}
+
+setmetatable(exports, {
+	__index = function(self, key)
+		local value = nil;
+		local success = false;
+
+		-- try looking in table of constants
+--[[
+		value = C[key]
+		if value then
+			rawset(self, key, value)
+			return value;
+		end
+--]]
+
+		-- try looking in the library for a function
+		success, value = pcall(function() return Lib_curl[key] end)
+		if success then
+			rawset(self, key, value);
+			return value;
+		end
+
+		-- try looking in the ffi.C namespace, for constants
+		-- and enums
+		success, value = pcall(function() return ffi.C[key] end)
+		--print("looking for constant/enum: ", key, success, value)
+		if success then
+			rawset(self, key, value);
+			return value;
+		end
+
+		-- Or maybe it's a type
+		success, value = pcall(function() return ffi.typeof(key) end)
+		if success then
+			rawset(self, key, value);
+			return value;
+		end
+
+		return nil;
+	end,
+})
+
 
 return exports;

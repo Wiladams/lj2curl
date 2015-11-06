@@ -21,15 +21,15 @@ typedef enum {
 } CURLMcode;
 ]]
 
-/* just to make code nicer when using curl_multi_socket() you can now check
-   for CURLM_CALL_MULTI_SOCKET too in the same style it works for
-   curl_multi_perform() and CURLM_CALL_MULTI_PERFORM */
-#define CURLM_CALL_MULTI_SOCKET CURLM_CALL_MULTI_PERFORM
+ffi.cdef[[
+static const int CURLM_CALL_MULTI_SOCKET = CURLM_CALL_MULTI_PERFORM;
 
 /* bitmask bits for CURLMOPT_PIPELINING */
-#define CURLPIPE_NOTHING   0L
-#define CURLPIPE_HTTP1     1L
-#define CURLPIPE_MULTIPLEX 2L
+static const int  CURLPIPE_NOTHING   = 0;
+static const int  CURLPIPE_HTTP1     = 1;
+static const int  CURLPIPE_MULTIPLEX = 2;
+]]
+
 
 ffi.cdef[[
 typedef enum {
@@ -54,9 +54,9 @@ ffi.cdef[[
 /* Based on poll(2) structure and values.
  * We don't use pollfd and POLL* constants explicitly
  * to cover platforms without poll(). */
-static const int CURL_WAIT_POLLIN    0x0001
-static const int CURL_WAIT_POLLPRI   0x0002
-static const int CURL_WAIT_POLLOUT   0x0004
+static const int CURL_WAIT_POLLIN    = 0x0001;
+static const int CURL_WAIT_POLLPRI   = 0x0002;
+static const int CURL_WAIT_POLLOUT   = 0x0004;
 
 
 struct curl_waitfd {
@@ -67,43 +67,35 @@ struct curl_waitfd {
 ]]
 
 ffi.cdef[[
+CURLM *curl_multi_init(void);
 
-CURL_EXTERN CURLM *curl_multi_init(void);
-
-
-CURL_EXTERN CURLMcode curl_multi_add_handle(CURLM *multi_handle,
+CURLMcode curl_multi_add_handle(CURLM *multi_handle,
                                             CURL *curl_handle);
 
-
-CURL_EXTERN CURLMcode curl_multi_remove_handle(CURLM *multi_handle,
+CURLMcode curl_multi_remove_handle(CURLM *multi_handle,
                                                CURL *curl_handle);
 
-
-CURL_EXTERN CURLMcode curl_multi_fdset(CURLM *multi_handle,
+/*
+CURLMcode curl_multi_fdset(CURLM *multi_handle,
                                        fd_set *read_fd_set,
                                        fd_set *write_fd_set,
                                        fd_set *exc_fd_set,
                                        int *max_fd);
+*/
 
-
-CURL_EXTERN CURLMcode curl_multi_wait(CURLM *multi_handle,
+CURLMcode curl_multi_wait(CURLM *multi_handle,
                                       struct curl_waitfd extra_fds[],
                                       unsigned int extra_nfds,
                                       int timeout_ms,
                                       int *ret);
 
-CURL_EXTERN CURLMcode curl_multi_perform(CURLM *multi_handle,
-                                         int *running_handles);
+CURLMcode curl_multi_perform(CURLM *multi_handle, int *running_handles);
 
+CURLMcode curl_multi_cleanup(CURLM *multi_handle);
 
-CURL_EXTERN CURLMcode curl_multi_cleanup(CURLM *multi_handle);
+CURLMsg *curl_multi_info_read(CURLM *multi_handle, int *msgs_in_queue);
 
-
-CURL_EXTERN CURLMsg *curl_multi_info_read(CURLM *multi_handle,
-                                          int *msgs_in_queue);
-
-
-CURL_EXTERN const char *curl_multi_strerror(CURLMcode);
+const char *curl_multi_strerror(CURLMcode);
 ]]
 
 ffi.cdef[[
@@ -134,23 +126,19 @@ typedef int (*curl_multi_timer_callback)(CURLM *multi,    /* multi handle */
                                          void *userp);    /* private callback
                                                              pointer */
 
-CURL_EXTERN CURLMcode curl_multi_socket(CURLM *multi_handle, curl_socket_t s,
-                                        int *running_handles);
+CURLMcode curl_multi_socket(CURLM *multi_handle, curl_socket_t s, int *running_handles);
 
-CURL_EXTERN CURLMcode curl_multi_socket_action(CURLM *multi_handle,
+CURLMcode curl_multi_socket_action(CURLM *multi_handle,
                                                curl_socket_t s,
                                                int ev_bitmask,
                                                int *running_handles);
 
-CURL_EXTERN CURLMcode curl_multi_socket_all(CURLM *multi_handle,
-                                            int *running_handles);
+CURLMcode curl_multi_socket_all(CURLM *multi_handle,  int *running_handles);
 ]]
 
 
 ffi.cdef[[
-
-CURL_EXTERN CURLMcode curl_multi_timeout(CURLM *multi_handle,
-                                         long *milliseconds);
+CURLMcode curl_multi_timeout(CURLM *multi_handle, long *milliseconds);
 ]]
 
 
@@ -179,12 +167,12 @@ typedef enum {
 
 ffi.cdef[[
 
-CURL_EXTERN CURLMcode curl_multi_setopt(CURLM *multi_handle,
+ CURLMcode curl_multi_setopt(CURLM *multi_handle,
                                         CURLMoption option, ...);
 
 
 
-CURL_EXTERN CURLMcode curl_multi_assign(CURLM *multi_handle,
+ CURLMcode curl_multi_assign(CURLM *multi_handle,
                                         curl_socket_t sockfd, void *sockp);
 ]]
 
@@ -195,9 +183,9 @@ static const int CURL_PUSH_DENY = 1;
 
 struct curl_pushheaders;  /* forward declaration only */
 
-CURL_EXTERN char *curl_pushheader_bynum(struct curl_pushheaders *h,
+ char *curl_pushheader_bynum(struct curl_pushheaders *h,
                                         size_t num);
-CURL_EXTERN char *curl_pushheader_byname(struct curl_pushheaders *h,
+ char *curl_pushheader_byname(struct curl_pushheaders *h,
                                          const char *name);
 
 typedef int (*curl_push_callback)(CURL *parent,
