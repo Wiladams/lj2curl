@@ -12,11 +12,9 @@ end
 
 
 if Lib_curl then
-	local flags = 0;
+	local flags = ffi.C.CURL_GLOBAL_DEFAULT;
     -- global_init(); must be called once per application lifetime
     Lib_curl.curl_global_init(flags);
-
-    --ffi.gc(Lib_curl, Lib_curl_cleanup);
 else
 	return false;
 end
