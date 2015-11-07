@@ -51,15 +51,6 @@ setmetatable(exports, {
 		local value = nil;
 		local success = false;
 
-		-- try looking in table of constants
---[[
-		value = C[key]
-		if value then
-			rawset(self, key, value)
-			return value;
-		end
---]]
-
 		-- try looking in the library for a function
 		success, value = pcall(function() return Lib_curl[key] end)
 		if success then
