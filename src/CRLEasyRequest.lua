@@ -2,8 +2,10 @@
 --]]
 
 local ffi = require("ffi")
-local curl = require("lj2curl")
+local bit = require("bit")
+local band, bor, lshift, rshift = bit.band, bit.bor, bit.lshift, bit.rshift
 
+local curl = require("lj2curl")
 
 local CRLEasyRequest = {}
 setmetatable(CRLEasyRequest, {
@@ -52,15 +54,34 @@ typedef union {
 } curl_info_union_t;
 ]]
 
+--[[
+static const int CURLINFO_STRING   = 0x100000;
+static const int CURLINFO_LONG     = 0x200000;
+static const int CURLINFO_DOUBLE   = 0x300000;
+static const int CURLINFO_SLIST    = 0x400000;
+static const int CURLINFO_SOCKET   = 0x500000;
+]]
+
 function CRLEasyRequest.getInfo(self, info)
+
 	local value = ffi.new("curl_info_union_t")
 	local res = curl.curl_easy_getinfo(self.Handle, info, value);
-	if curl.CURLE_OK == res then
-		return value
+	if curl.CURLE_OK ~= res then
+		return false, ffi.string(curl.curl_easy_strerror(res));
 	end
 
-	return false, ffi.string(curl.curl_easy_strerror(res));
+	local infoType = band(curl.CURLINFO_TYPEMASK, info)
 
+--print(string.format("\ninfoType: 0x%x", infoType))
+	if infoType == curl.CURLINFO_STRING then
+		return ffi.string(value.strValue)
+	elseif infoType == curl.CURLINFO_LONG then
+		return value.longValue
+	elseif infoType == curl.CURLINFO_DOUBLE then
+		return tonumber(value.doubleValue);
+	end
+	
+	return value;
 end
 
 function CRLEasyRequest.perform(self)

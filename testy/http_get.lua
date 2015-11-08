@@ -9,31 +9,92 @@ local ffi = require("ffi")
 local curl = require("lj2curl")
 local ezreq = require("CRLEasyRequest")
 
-local function getit()
+local long = ffi.typeof("long")
 
-if not arg[1] then return end
+-- This is a simple lookup table to go from the CURLINFO_ constants to strings
+local infoNames = {
+	[curl.CURLINFO_NONE] = "NONE", 						-- /* first, never use this */
+	[curl.CURLINFO_EFFECTIVE_URL] 	= "CURLINFO_EFFECTIVE_URL",    	-- = CURLINFO_STRING + 1,
+	[curl.CURLINFO_RESPONSE_CODE]    = "CURLINFO_RESPONSE_CODE",								-- CURLINFO_LONG   + 2,
+	[curl.CURLINFO_TOTAL_TIME]       = "CURLINFO_TOTAL_TIME",								-- CURLINFO_DOUBLE + 3,
+	[curl.CURLINFO_NAMELOOKUP_TIME]  = "CURLINFO_NAMELOOKUP_TIME",								-- CURLINFO_DOUBLE + 4,
+	[curl.CURLINFO_CONNECT_TIME]     = "CURLINFO_CONNECT_TIME",								-- CURLINFO_DOUBLE + 5,
+	[curl.CURLINFO_PRETRANSFER_TIME] = "CURLINFO_PRETRANSFER_TIME",								-- CURLINFO_DOUBLE + 6,
+	[curl.CURLINFO_SIZE_UPLOAD]      = "CURLINFO_SIZE_UPLOAD",								-- CURLINFO_DOUBLE + 7,
+	[curl.CURLINFO_SIZE_DOWNLOAD]    = "CURLINFO_SIZE_DOWNLOAD",								-- CURLINFO_DOUBLE + 8,
+	[curl.CURLINFO_SPEED_DOWNLOAD]   = "CURLINFO_SPEED_DOWNLOAD",								-- CURLINFO_DOUBLE + 9,
+	[curl.CURLINFO_SPEED_UPLOAD]     = "CURLINFO_SPEED_UPLOAD",								-- CURLINFO_DOUBLE + 10,
+	[curl.CURLINFO_HEADER_SIZE]      = "CURLINFO_HEADER_SIZE",								-- CURLINFO_LONG   + 11,
+	[curl.CURLINFO_REQUEST_SIZE]     = "CURLINFO_REQUEST_SIZE",								-- CURLINFO_LONG   + 12,
+	[curl.CURLINFO_SSL_VERIFYRESULT] = "CURLINFO_SSL_VERIFYRESULT",								-- CURLINFO_LONG   + 13,
+	[curl.CURLINFO_FILETIME]         = "CURLINFO_FILETIME",								-- CURLINFO_LONG   + 14,
+	[curl.CURLINFO_CONTENT_LENGTH_DOWNLOAD]   = "CURLINFO_CONTENT_LENGTH_DOWNLOAD",						-- CURLINFO_DOUBLE + 15,
+	[curl.CURLINFO_CONTENT_LENGTH_UPLOAD]     = "CURLINFO_CONTENT_LENGTH_UPLOAD", --CURLINFO_DOUBLE + 16,
+	[curl.CURLINFO_STARTTRANSFER_TIME] = "CURLINFO_STARTTRANSFER_TIME", --CURLINFO_DOUBLE + 17,
+	[curl.CURLINFO_CONTENT_TYPE]     = "CURLINFO_CONTENT_TYPE", --CURLINFO_STRING + 18,
+	[curl.CURLINFO_REDIRECT_TIME]    = "CURLINFO_REDIRECT_TIME", --CURLINFO_DOUBLE + 19,
+	[curl.CURLINFO_REDIRECT_COUNT]   = "CURLINFO_REDIRECT_COUNT", --CURLINFO_LONG   + 20,
+	[curl.CURLINFO_PRIVATE]          = "CURLINFO_PRIVATE", --CURLINFO_STRING + 21,
+	[curl.CURLINFO_HTTP_CONNECTCODE] = "CURLINFO_HTTP_CONNECTCODE", --CURLINFO_LONG   + 22,
+	[curl.CURLINFO_HTTPAUTH_AVAIL]   = "CURLINFO_HTTPAUTH_AVAIL", --CURLINFO_LONG   + 23,
+	[curl.CURLINFO_PROXYAUTH_AVAIL]  = "CURLINFO_PROXYAUTH_AVAIL", --CURLINFO_LONG   + 24,
+	[curl.CURLINFO_OS_ERRNO]         = "CURLINFO_OS_ERRNO", --CURLINFO_LONG   + 25,
+	[curl.CURLINFO_NUM_CONNECTS]     = "CURLINFO_NUM_CONNECTS", --CURLINFO_LONG   + 26,
+	[curl.CURLINFO_SSL_ENGINES]      = "CURLINFO_SSL_ENGINES", --CURLINFO_SLIST  + 27,
+	[curl.CURLINFO_COOKIELIST]       = "CURLINFO_COOKIELIST", --CURLINFO_SLIST  + 28,
+	[curl.CURLINFO_LASTSOCKET]       = "CURLINFO_LASTSOCKET", --CURLINFO_LONG   + 29,
+	[curl.CURLINFO_FTP_ENTRY_PATH]   = "CURLINFO_FTP_ENTRY_PATH", --CURLINFO_STRING + 30,
+	[curl.CURLINFO_REDIRECT_URL]     = "CURLINFO_REDIRECT_URL", --CURLINFO_STRING + 31,
+	[curl.CURLINFO_PRIMARY_IP]       = "CURLINFO_PRIMARY_IP", --CURLINFO_STRING + 32,
+	[curl.CURLINFO_APPCONNECT_TIME]  = "CURLINFO_APPCONNECT_TIME", --CURLINFO_DOUBLE + 33,
+	[curl.CURLINFO_CERTINFO]         = "CURLINFO_CERTINFO", --CURLINFO_SLIST  + 34,
+	[curl.CURLINFO_CONDITION_UNMET]  = "CURLINFO_CONDITION_UNMET", --CURLINFO_LONG   + 35,
+	[curl.CURLINFO_RTSP_SESSION_ID]  = "CURLINFO_RTSP_SESSION_ID", --CURLINFO_STRING + 36,
+	[curl.CURLINFO_RTSP_CLIENT_CSEQ] = "CURLINFO_RTSP_CLIENT_CSEQ", --CURLINFO_LONG   + 37,
+	[curl.CURLINFO_RTSP_SERVER_CSEQ] = "CURLINFO_RTSP_SERVER_CSEQ", --CURLINFO_LONG   + 38,
+	[curl.CURLINFO_RTSP_CSEQ_RECV]   = "CURLINFO_RTSP_CSEQ_RECV", --CURLINFO_LONG   + 39,
+	[curl.CURLINFO_PRIMARY_PORT]     = "CURLINFO_PRIMARY_PORT", --CURLINFO_LONG   + 40,
+	[curl.CURLINFO_LOCAL_IP]         = "CURLINFO_LOCAL_IP", --CURLINFO_STRING + 41,
+	[curl.CURLINFO_LOCAL_PORT]       = "CURLINFO_LOCAL_PORT", --CURLINFO_LONG   + 42,
+	[curl.CURLINFO_TLS_SESSION]      = "CURLINFO_TLS_SESSION", --CURLINFO_SLIST  + 43,
+	[curl.CURLINFO_ACTIVESOCKET]     = "CURLINFO_ACTIVESOCKET", --CURLINFO_SOCKET + 44,
+}
 
-
-local conn = ezreq(arg[1])
-assert(conn)
-
-local res, err, errstr = conn:perform()
-
-if not res then
-	print("perform error(): ", err, errstr)
-	return false, err
+local function printInfo(conn, fields)
+	for _,field in ipairs(fields) do
+		--print("field: ", field)
+		io.write(string.format("%s : ", infoNames[field]))
+		print(conn:getInfo(field))
+	end
 end
 
--- ask for the content-type */ 
-local res, err, errstr = conn:getInfo(curl.CURLINFO_CONTENT_TYPE);
- 
-if res then
-    print("\ngeInfo(), res: ", res)
-    print(string.format("We received Content-Type: %s\n", ffi.string(res.strValue)));
-else
-	print("getInfo(), err: ", err, errstr)
+local function getit(url)
+
+	local conn = ezreq(arg[1])
+	assert(conn)
+	conn:setOption(curl.CURLOPT_VERBOSE, long(1))
+
+	local res, err, errstr = conn:perform()
+	print();
+
+	if not res then
+		print("perform error(): ", err, errstr)
+		return false, err
+	end
+
+	-- print various fields
+	local infoFields = {
+		curl.CURLINFO_EFFECTIVE_URL,
+		curl.CURLINFO_RESPONSE_CODE,
+		curl.CURLINFO_CONTENT_TYPE,
+		curl.CURLINFO_CONTENT_LENGTH_DOWNLOAD,
+		curl.CURLINFO_PRIMARY_IP,
+		curl.CURLINFO_PRIMARY_PORT,
+		curl.CURLINFO_LOCAL_IP,
+		curl.CURLINFO_LOCAL_PORT,
+	}
+	printInfo(conn, infoFields)
 end
 
-end
-
-getit()
+assert(arg[1])
+getit(arg[1])
