@@ -23,6 +23,7 @@ function CRLEasyRequest.init(self, handle, ...)
 	setmetatable(obj, CRLEasyRequest_mt)
 
 	if select('#',...) > 0 then
+		print("init, size: ", select('#',...))
 		if type(select(1,...)) == "string" then
 			obj:url(select(1, ...))
 		end
@@ -52,14 +53,21 @@ typedef union {
 ]]
 
 function CRLEasyRequest.getInfo(self, info)
-	local value = ffi.new("curl_info_union_t[1]")
+	local value = ffi.new("curl_info_union_t")
 	local res = curl.curl_easy_getinfo(self.Handle, info, value);
+	if curl.CURLE_OK == res then
+		return value
+	end
 
-	return value;
+	return false, ffi.string(curl.curl_easy_strerror(res));
+
 end
 
 function CRLEasyRequest.perform(self)
 	local res = curl.curl_easy_perform(self.Handle);
+	if res ~= curl.CURLE_OK then
+		return false, ffi.string(curl.curl_easy_strerror(res));
+	end
 
 	return self;
 end
@@ -75,7 +83,7 @@ function CRLEasyRequest.receive(self, buffer, buflen)
 	local res = curl.curl_easy_recv(self.Handle, buffer, buflen, bytesTransferred);
 
 	if res ~= curl.CURLE_OK then
-		return false, res 
+		return false, res, ffi.string(curl.curl_easy_strerror(res))
 	end
 
 	bytesTransferred = bytesTransferred[0];
@@ -88,7 +96,7 @@ function CRLEasyRequest.send(self, buffer, buflen)
 	local res = curl.curl_easy_send(self.Handle, buffer, buflen, bytesTransferred);
 
 	if res ~= curl.CURLE_OK then
-		return false, res 
+		return false, res, ffi.string(curl.curl_easy_strerror(res))
 	end
 
 	bytesTransferred = bytesTransferred[0];
@@ -98,8 +106,9 @@ end
 
 function CRLEasyRequest.setOption(self, opt, param)
 	local res = curl.curl_easy_setopt(self.Handle, opt, param);
+	
 	if res ~= curl.CURLE_OK then
-		return false, res;
+		return false, res, ffi.string(curl.curl_easy_strerror(res));
 	end
 
 	return self;
@@ -107,8 +116,7 @@ end
 
 -- Some handy options
 function CRLEasyRequest.url(self, strurl)
-	return self:setOption(curl.CURLOPT_URL, strurl)
+	return self:setOption(curl.CURLOPT_URL, ffi.cast("const char *", strurl))
 end
-
 
 return CRLEasyRequest
