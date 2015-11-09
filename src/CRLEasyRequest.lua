@@ -25,7 +25,6 @@ function CRLEasyRequest.init(self, handle, ...)
 	setmetatable(obj, CRLEasyRequest_mt)
 
 	if select('#',...) > 0 then
-		print("init, size: ", select('#',...))
 		if type(select(1,...)) == "string" then
 			obj:url(select(1, ...))
 		end
