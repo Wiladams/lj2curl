@@ -208,6 +208,21 @@ local k = {
    0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
    }
 
+-- convert from a string of hex values to a 
+-- binary string
+function hexa2str(str)
+    return (str:gsub('..', function (cc)
+        return string.char(tonumber(cc, 16))
+    end))
+end
+
+
+local function str2hexa (s)
+	local h = string.gsub(s, ".",
+		function(c) return string.format("%02x", string.byte(c)) end)
+  return h
+end
+
 -- transform a string of bytes in a string of hexadecimal digits
 local function str2hexa (s)
 	local h = string.gsub(s, ".",
@@ -413,14 +428,23 @@ end
 	uri - The uri you are connecting to
 	key_name - name of the Sas key that is being used
 	key - actual Sas key
+
+	Reference
+	http://hypernephelist.com/2014/09/16/sending-data-to-azure-event-hubs-from-nodejs.html
 --]]
 local function createSasToken(uri, key_name, key, expiry)
     -- If no expiration is specified, then use
     -- one hour from current time (local timezone)
-    expiry = expiry or os.time() + 60 * 60 * 1;
+    local secspermin = 60
+    local minsperhour = 60
+    expiry = expiry or os.time() + 24 * minsperhour * secspermin ;
 
     local string_to_sign = urlencode(uri) .. '\n' .. expiry;
+print("string_to_sign: ", string_to_sign)
+
     local hmac = hmac_sha256(string_to_sign, key);
+print("hmac: ", hmac)
+
  	local signature = base64.encode(hmac);
     local token = 'SharedAccessSignature sr=' .. urlencode(uri) .. '&sig=' .. urlencode(signature) .. '&se=' .. expiry .. '&skn=' .. key_name;
 

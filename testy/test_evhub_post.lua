@@ -56,9 +56,7 @@ end
 
 -- Retrieve a particular URL
 local function main(params)
-	--local url = string.format("https://{Service Bus Namespace}.servicebus.windows.net/{Event Hub Name}/messages
 	local url = string.format("https://%s.servicebus.windows.net/%s/messages",	params.sbusNamespace, params.evhubName);
-	--local url = "https://"..params.sbusNamespace..".servicebus.windows.net/"..params.evhubName.."/publishers/"..params.deviceName.."/messages"
 print("URL: ", url)
 	
 	local req = CRLHttpRequest(url)
@@ -73,15 +71,12 @@ print("URL: ", url)
 
 
 	-- set some general headers
-	local saskey = "";
-	local sasencoded = scrypto.createSasToken(url, params.keyName, params.keyValue);
-	--print("sas encoded: ", sasencoded)
-	req:addHeader("Authorization", sasencoded)
-	--req:addHeader("Transfer-Encoding", "chunked")
-	req:addHeader("Expect", "")
+	req:addHeader("Authorization", params.sasToken)
 	req:addHeader("Content-Type", 'application/atom+xml;type=entry;charset=utf-8')
+	--req:addHeader("Transfer-Encoding", "chunked")
+	--req:addHeader("Expect", "")
 
-	local ehubbody = "This is my body you eat"
+	local ehubbody = '{"phrase": "This is my body you eat"}'
 	req:setOption(curl.CURLOPT_POSTFIELDS, ffi.cast("const char *", ehubbody));
 	req:setOption(curl.CURLOPT_POSTFIELDSIZE, long(#ehubbody)); 
 
@@ -120,5 +115,10 @@ print("URL: ", url)
 --]]
 end
 
-local params = {}
+local sasToken = arg[1]
+local params = {
+	sbusNamespace = "azl-evhub2",
+	evhubName = "testhub1",
+	sasToken = sasToken,
+}
 main(params)
