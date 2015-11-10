@@ -1,5 +1,17 @@
 --scrypto.lua
+--[[
+	Herein there are just enough routines to do the typical amount of 
+	crypto required to interact with a web service.
 
+	base64
+	urlencode
+	sha256
+	hmac
+
+	There is one service specific routine: createSasToken
+	Which is used by the Azure Service Bus to create tokens appropriate
+	for that service.
+--]]
 local ffi = require "ffi"
 local bit = require ("bit")
 local tobit = bit.tobit;
@@ -402,9 +414,10 @@ end
 	key_name - name of the Sas key that is being used
 	key - actual Sas key
 --]]
-local function createSasToken(uri, key_name, key)
-    -- Token expires in one hour
-    local expiry = os.time() + 60 * 60 * 1;
+local function createSasToken(uri, key_name, key, expiry)
+    -- If no expiration is specified, then use
+    -- one hour from current time (local timezone)
+    expiry = expiry or os.time() + 60 * 60 * 1;
 
     local string_to_sign = urlencode(uri) .. '\n' .. expiry;
     local hmac = hmac_sha256(string_to_sign, key);

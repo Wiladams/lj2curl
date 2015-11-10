@@ -11,6 +11,7 @@ local ezreq = require("CRLEasyRequest")
 local fun = require("fun")
 local infoName = require("curlInfo")
 local CRLHttpRequest = require("CRLHttpRequest")
+local scrypto = require("scrypto")
 
 local long = ffi.typeof("long")
 
@@ -56,10 +57,8 @@ end
 -- Retrieve a particular URL
 local function main(params)
 	--local url = string.format("https://{Service Bus Namespace}.servicebus.windows.net/{Event Hub Name}/messages
-	--local url = string.format("https://%s.servicebus.windows.net/%s/messages",
-	--	params.sbusNamespace,
-	--	params.evhubName);
-	local url = "https://"..params.sbusNamespace..".servicebus.windows.net/"..params.evhubName.."/publishers/"..params.deviceName.."/messages"
+	local url = string.format("https://%s.servicebus.windows.net/%s/messages",	params.sbusNamespace, params.evhubName);
+	--local url = "https://"..params.sbusNamespace..".servicebus.windows.net/"..params.evhubName.."/publishers/"..params.deviceName.."/messages"
 print("URL: ", url)
 	
 	local req = CRLHttpRequest(url)
@@ -75,7 +74,7 @@ print("URL: ", url)
 
 	-- set some general headers
 	local saskey = "";
-	local sasencoded = ffi.string(curl.curl_easy_escape(req.Handle, saskey, #saskey));
+	local sasencoded = scrypto.createSasToken(url, params.keyName, params.keyValue);
 	--print("sas encoded: ", sasencoded)
 	req:addHeader("Authorization", sasencoded)
 	--req:addHeader("Transfer-Encoding", "chunked")
