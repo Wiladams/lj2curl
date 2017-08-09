@@ -217,12 +217,6 @@ function hexa2str(str)
 end
 
 
-local function str2hexa (s)
-	local h = string.gsub(s, ".",
-		function(c) return string.format("%02x", string.byte(c)) end)
-  return h
-end
-
 -- transform a string of bytes in a string of hexadecimal digits
 local function str2hexa (s)
 	local h = string.gsub(s, ".",
@@ -407,7 +401,11 @@ local function hmac_new(hash, blocksize)
 	end
 end
 
-local	hmac_sha256 = hmac_new(sha256, 64);
+local function binsha256(msg)
+	return hexa2str(sha256(msg))
+end
+
+local	hmac_sha256 = hmac_new(binsha256, 64);
 
 
 
@@ -443,9 +441,11 @@ local function createSasToken(uri, key_name, key, expiry)
 print("string_to_sign: ", string_to_sign)
 
     local hmac = hmac_sha256(string_to_sign, key);
-print("hmac: ", hmac)
+print("hmac: ", #hmac, str2hexa(hmac))
 
  	local signature = base64.encode(hmac);
+ print("signature: ", signature)
+
     local token = 'SharedAccessSignature sr=' .. urlencode(uri) .. '&sig=' .. urlencode(signature) .. '&se=' .. expiry .. '&skn=' .. key_name;
 
     return token;

@@ -54,31 +54,20 @@ local function iter_infoFields(conn, fields)
 	return gen_info, fields, 1
 end
 
--- Retrieve a particular URL
-local function main(params)
-	local url = string.format("https://%s.servicebus.windows.net/%s/messages",	params.sbusNamespace, params.evhubName);
-print("URL: ", url)
-	
+local function postEntry(url, body, sasToken)
 	local req = CRLHttpRequest(url)
 	assert(req)
 
 	-- set some specific options
-	req:setOption(curl.CURLOPT_VERBOSE, long(1))
+	--req:setOption(curl.CURLOPT_VERBOSE, long(1))
 	req:setOption(curl.CURLOPT_POST, long(1))
-	--req:setOption(curl.CURLOPT_HEADER, long(1))
-	--req:setOption(curl.CURLOPT_HEADERFUNCTION, ffi.cast("header_callback", receiveHeaders))
-	--req:setOption(curl.CURLOPT_WRITEFUNCTION, ffi.cast("write_callback", receiveBody))
-
 
 	-- set some general headers
-	req:addHeader("Authorization", params.sasToken)
+	req:addHeader("Authorization", sasToken)
 	req:addHeader("Content-Type", 'application/atom+xml;type=entry;charset=utf-8')
-	--req:addHeader("Transfer-Encoding", "chunked")
-	--req:addHeader("Expect", "")
 
-	local ehubbody = '{"phrase": "This is my body you eat"}'
-	req:setOption(curl.CURLOPT_POSTFIELDS, ffi.cast("const char *", ehubbody));
-	req:setOption(curl.CURLOPT_POSTFIELDSIZE, long(#ehubbody)); 
+	req:setOption(curl.CURLOPT_POSTFIELDS, ffi.cast("const char *", body));
+	req:setOption(curl.CURLOPT_POSTFIELDSIZE, long(#body)); 
 
 	-- Execute the request
 	local res, err, errstr = req:send()
@@ -88,37 +77,25 @@ print("URL: ", url)
 		return false, err
 	end
 
---[[
-	local headstr = table.concat(headers);
-	print("==== HEADERS ====")
-	print(headstr)
-
-	local bodystr = table.concat(body);
-	print("==== BODY ====")
-	print(bodystr)
-
-	print();
-
-	-- print various fields
-	local infoFields = {
-		curl.CURLINFO_EFFECTIVE_URL,
-		curl.CURLINFO_RESPONSE_CODE,
-		curl.CURLINFO_CONTENT_TYPE,
-		curl.CURLINFO_CONTENT_LENGTH_DOWNLOAD,
-		curl.CURLINFO_PRIMARY_IP,
-		curl.CURLINFO_PRIMARY_PORT,
-		curl.CURLINFO_LOCAL_IP,
-		curl.CURLINFO_LOCAL_PORT,
-	}
-	print("==== INFO ====")
-	fun.each(print, iter_infoFields(conn, infoFields))
---]]
+	return true;
 end
 
-local sasToken = arg[1]
-local params = {
-	sbusNamespace = "azl-evhub2",
-	evhubName = "testhub1",
-	sasToken = sasToken,
-}
+local function main(params)
+	local url = string.format("https://%s.servicebus.windows.net/%s/messages",	params.sbusNamespace, params.evhubName);
+--print("URL: ", url)
+	
+	for count=1,params.iterations or 10 do
+		print("sending: ", count)
+		local body = string.format('{"phrase": "This is my count: %d"}', count)
+		if not postEntry(url, body, params.sasToken) then
+			break
+		end
+	end
+
+end
+
+local sasToken = arg[1] or "[SharedAccessSignature goes here]"
+
+local params = {}
+
 main(params)
